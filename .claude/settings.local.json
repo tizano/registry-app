@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run *)",
+      "Bash(bunx tsc *)",
+      "Bash(bun remove *)",
+      "Bash(bun add *)",
+      "Bash(bun -e ' *)",
+      "Bash(bunx biome *)",
+      "Bash(bunx shadcn@latest add input-otp)"
+    ]
+  }
+}

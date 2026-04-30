@@ -1,0 +1,1 @@
+ALTER TABLE "ph_entries" ADD COLUMN "sheet_row_synced" boolean DEFAULT false NOT NULL;

@@ -9,12 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetRouteImport } from './routes/reset'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RegistreIndexRouteImport } from './routes/registre.index'
+import { Route as RegistreTemperatureRouteImport } from './routes/registre.temperature'
+import { Route as RegistrePhRouteImport } from './routes/registre.ph'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
+import { Route as ApiRegistreTemperatureRouteImport } from './routes/api.registre.temperature'
+import { Route as ApiRegistrePhRouteImport } from './routes/api.registre.ph'
 
+const ResetRoute = ResetRouteImport.update({
+  id: '/reset',
+  path: '/reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistreIndexRoute = RegistreIndexRouteImport.update({
+  id: '/registre/',
+  path: '/registre/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistreTemperatureRoute = RegistreTemperatureRouteImport.update({
+  id: '/registre/temperature',
+  path: '/registre/temperature',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistrePhRoute = RegistrePhRouteImport.update({
+  id: '/registre/ph',
+  path: '/registre/ph',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
@@ -22,40 +54,141 @@ const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   path: '/api/trpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiRegistreTemperatureRoute = ApiRegistreTemperatureRouteImport.update({
+  id: '/api/registre/temperature',
+  path: '/api/registre/temperature',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRegistrePhRoute = ApiRegistrePhRouteImport.update({
+  id: '/api/registre/ph',
+  path: '/api/registre/ph',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/reset': typeof ResetRoute
+  '/registre/ph': typeof RegistrePhRoute
+  '/registre/temperature': typeof RegistreTemperatureRoute
+  '/registre/': typeof RegistreIndexRoute
+  '/api/registre/ph': typeof ApiRegistrePhRoute
+  '/api/registre/temperature': typeof ApiRegistreTemperatureRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/reset': typeof ResetRoute
+  '/registre/ph': typeof RegistrePhRoute
+  '/registre/temperature': typeof RegistreTemperatureRoute
+  '/registre': typeof RegistreIndexRoute
+  '/api/registre/ph': typeof ApiRegistrePhRoute
+  '/api/registre/temperature': typeof ApiRegistreTemperatureRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/reset': typeof ResetRoute
+  '/registre/ph': typeof RegistrePhRoute
+  '/registre/temperature': typeof RegistreTemperatureRoute
+  '/registre/': typeof RegistreIndexRoute
+  '/api/registre/ph': typeof ApiRegistrePhRoute
+  '/api/registre/temperature': typeof ApiRegistreTemperatureRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/trpc/$'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/reset'
+    | '/registre/ph'
+    | '/registre/temperature'
+    | '/registre/'
+    | '/api/registre/ph'
+    | '/api/registre/temperature'
+    | '/api/trpc/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/trpc/$'
-  id: '__root__' | '/' | '/api/trpc/$'
+  to:
+    | '/'
+    | '/login'
+    | '/reset'
+    | '/registre/ph'
+    | '/registre/temperature'
+    | '/registre'
+    | '/api/registre/ph'
+    | '/api/registre/temperature'
+    | '/api/trpc/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/reset'
+    | '/registre/ph'
+    | '/registre/temperature'
+    | '/registre/'
+    | '/api/registre/ph'
+    | '/api/registre/temperature'
+    | '/api/trpc/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  ResetRoute: typeof ResetRoute
+  RegistrePhRoute: typeof RegistrePhRoute
+  RegistreTemperatureRoute: typeof RegistreTemperatureRoute
+  RegistreIndexRoute: typeof RegistreIndexRoute
+  ApiRegistrePhRoute: typeof ApiRegistrePhRoute
+  ApiRegistreTemperatureRoute: typeof ApiRegistreTemperatureRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset': {
+      id: '/reset'
+      path: '/reset'
+      fullPath: '/reset'
+      preLoaderRoute: typeof ResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registre/': {
+      id: '/registre/'
+      path: '/registre'
+      fullPath: '/registre/'
+      preLoaderRoute: typeof RegistreIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registre/temperature': {
+      id: '/registre/temperature'
+      path: '/registre/temperature'
+      fullPath: '/registre/temperature'
+      preLoaderRoute: typeof RegistreTemperatureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registre/ph': {
+      id: '/registre/ph'
+      path: '/registre/ph'
+      fullPath: '/registre/ph'
+      preLoaderRoute: typeof RegistrePhRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/trpc/$': {
@@ -65,11 +198,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTrpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/registre/temperature': {
+      id: '/api/registre/temperature'
+      path: '/api/registre/temperature'
+      fullPath: '/api/registre/temperature'
+      preLoaderRoute: typeof ApiRegistreTemperatureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/registre/ph': {
+      id: '/api/registre/ph'
+      path: '/api/registre/ph'
+      fullPath: '/api/registre/ph'
+      preLoaderRoute: typeof ApiRegistrePhRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  ResetRoute: ResetRoute,
+  RegistrePhRoute: RegistrePhRoute,
+  RegistreTemperatureRoute: RegistreTemperatureRoute,
+  RegistreIndexRoute: RegistreIndexRoute,
+  ApiRegistrePhRoute: ApiRegistrePhRoute,
+  ApiRegistreTemperatureRoute: ApiRegistreTemperatureRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
 }
 export const routeTree = rootRouteImport
