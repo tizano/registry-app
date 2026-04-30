@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	createFileRoute,
-	redirect,
+	Navigate,
 	useNavigate,
 } from "@tanstack/react-router";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
@@ -14,22 +14,17 @@ import {
 	InputOTPSlot,
 } from "#/components/ui/input-otp";
 import { useTRPC } from "#/integrations/trpc/react";
+import { useAuthGuard } from "#/lib/auth-guard";
 
 export const Route = createFileRoute("/login")({
 	component: LoginPage,
-	beforeLoad: async ({ context }) => {
-		if (typeof document === "undefined") return;
-		const me = await context.queryClient.fetchQuery(
-			context.trpc.auth.me.queryOptions(),
-		);
-		if (me.authenticated) throw redirect({ to: "/registre" });
-	},
 });
 
 function LoginPage() {
 	const navigate = useNavigate();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
+	const guard = useAuthGuard();
 	const [pin, setPin] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const tapTimes = useRef<number[]>([]);
@@ -46,6 +41,8 @@ function LoginPage() {
 			},
 		}),
 	);
+
+	if (guard.state === "authenticated") return <Navigate to="/registre" />;
 
 	function handleHiddenTap() {
 		const now = Date.now();

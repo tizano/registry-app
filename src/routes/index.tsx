@@ -1,12 +1,17 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+
+import { useAuthGuard } from "#/lib/auth-guard";
 
 export const Route = createFileRoute("/")({
-	component: () => null,
-	beforeLoad: async ({ context }) => {
-		if (typeof document === "undefined") return;
-		const me = await context.queryClient.fetchQuery(
-			context.trpc.auth.me.queryOptions(),
-		);
-		throw redirect({ to: me.authenticated ? "/registre" : "/login" });
-	},
+	component: HomeRedirect,
 });
+
+function HomeRedirect() {
+	const guard = useAuthGuard();
+	if (guard.state === "loading") return null;
+	return (
+		<Navigate
+			to={guard.state === "authenticated" ? "/registre" : "/login"}
+		/>
+	);
+}

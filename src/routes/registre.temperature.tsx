@@ -1,6 +1,6 @@
 import {
 	createFileRoute,
-	redirect,
+	Navigate,
 	useNavigate,
 } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
@@ -11,20 +11,15 @@ import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 import { Textarea } from "#/components/ui/textarea";
+import { useAuthGuard } from "#/lib/auth-guard";
 
 export const Route = createFileRoute("/registre/temperature")({
 	component: TemperaturePage,
-	beforeLoad: async ({ context }) => {
-		if (typeof document === "undefined") return;
-		const me = await context.queryClient.fetchQuery(
-			context.trpc.auth.me.queryOptions(),
-		);
-		if (!me.authenticated) throw redirect({ to: "/login" });
-	},
 });
 
 function TemperaturePage() {
 	const navigate = useNavigate();
+	const guard = useAuthGuard();
 	const [value, setValue] = useState("");
 	const [unit, setUnit] = useState<"C" | "F">("C");
 	const [photo, setPhoto] = useState<File | null>(null);
@@ -70,6 +65,9 @@ function TemperaturePage() {
 			setSubmitting(false);
 		}
 	}
+
+	if (guard.state === "loading") return null;
+	if (guard.state === "unauthenticated") return <Navigate to="/login" />;
 
 	return (
 		<div className="flex min-h-dvh flex-col p-6 gap-5">

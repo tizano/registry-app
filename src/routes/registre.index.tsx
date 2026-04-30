@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	createFileRoute,
-	redirect,
+	Navigate,
 	useNavigate,
 } from "@tanstack/react-router";
 import { CameraIcon, LogOutIcon, ThermometerIcon } from "lucide-react";
@@ -9,22 +9,17 @@ import { CameraIcon, LogOutIcon, ThermometerIcon } from "lucide-react";
 import { InstallPrompt } from "#/components/InstallPrompt";
 import { Button } from "#/components/ui/button";
 import { useTRPC } from "#/integrations/trpc/react";
+import { useAuthGuard } from "#/lib/auth-guard";
 
 export const Route = createFileRoute("/registre/")({
 	component: RegistreIndex,
-	beforeLoad: async ({ context }) => {
-		if (typeof document === "undefined") return;
-		const me = await context.queryClient.fetchQuery(
-			context.trpc.auth.me.queryOptions(),
-		);
-		if (!me.authenticated) throw redirect({ to: "/login" });
-	},
 });
 
 function RegistreIndex() {
 	const navigate = useNavigate();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
+	const guard = useAuthGuard();
 
 	const logout = useMutation(
 		trpc.auth.logout.mutationOptions({
@@ -34,6 +29,9 @@ function RegistreIndex() {
 			},
 		}),
 	);
+
+	if (guard.state === "loading") return null;
+	if (guard.state === "unauthenticated") return <Navigate to="/login" />;
 
 	return (
 		<div className="flex min-h-dvh flex-col p-6 gap-6">

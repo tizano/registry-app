@@ -1,6 +1,6 @@
 import {
 	createFileRoute,
-	redirect,
+	Navigate,
 	useNavigate,
 } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
@@ -10,20 +10,15 @@ import { PhotoCapture } from "#/components/PhotoCapture";
 import { Button } from "#/components/ui/button";
 import { Label } from "#/components/ui/label";
 import { Textarea } from "#/components/ui/textarea";
+import { useAuthGuard } from "#/lib/auth-guard";
 
 export const Route = createFileRoute("/registre/ph")({
 	component: PhPage,
-	beforeLoad: async ({ context }) => {
-		if (typeof document === "undefined") return;
-		const me = await context.queryClient.fetchQuery(
-			context.trpc.auth.me.queryOptions(),
-		);
-		if (!me.authenticated) throw redirect({ to: "/login" });
-	},
 });
 
 function PhPage() {
 	const navigate = useNavigate();
+	const guard = useAuthGuard();
 	const [photo, setPhoto] = useState<File | null>(null);
 	const [note, setNote] = useState("");
 	const [submitting, setSubmitting] = useState(false);
@@ -62,6 +57,9 @@ function PhPage() {
 			setSubmitting(false);
 		}
 	}
+
+	if (guard.state === "loading") return null;
+	if (guard.state === "unauthenticated") return <Navigate to="/login" />;
 
 	return (
 		<div className="flex min-h-dvh flex-col p-6 gap-5">
