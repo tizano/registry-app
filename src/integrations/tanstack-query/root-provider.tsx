@@ -7,11 +7,15 @@ import { TRPCProvider } from "#/integrations/trpc/react";
 import type { TRPCRouter } from "#/integrations/trpc/router";
 
 function getUrl() {
-	const base = (() => {
-		if (typeof window !== "undefined") return "";
-		return `http://localhost:${process.env.PORT ?? 3000}`;
-	})();
-	return `${base}/api/trpc`;
+	if (typeof window !== "undefined") return "/api/trpc";
+
+	if (process.env.VERCEL_URL) {
+		return `https://${process.env.VERCEL_URL}/api/trpc`;
+	}
+	if (process.env.APP_URL) {
+		return `${process.env.APP_URL.replace(/\/$/, "")}/api/trpc`;
+	}
+	return `http://localhost:${process.env.PORT ?? 3000}/api/trpc`;
 }
 
 export const trpcClient = createTRPCClient<TRPCRouter>({
