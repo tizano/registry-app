@@ -4,23 +4,28 @@ import { createTRPCContext } from "#/integrations/trpc/context";
 import { trpcRouter } from "#/integrations/trpc/router";
 
 async function handler({ request }: { request: Request }) {
-	const res = await fetchRequestHandler({
-		req: request,
-		router: trpcRouter,
-		endpoint: "/api/trpc",
-		createContext: ({ req, resHeaders }) =>
-			createTRPCContext({ req, resHeaders }),
-	});
-
-	const setCookie = res.headers.get("set-cookie");
-	console.log("[AUTH][api] response", {
-		url: request.url,
-		status: res.status,
-		hasSetCookie: setCookie != null,
-		setCookieSnippet: setCookie?.slice(0, 80),
-	});
-
-	return res;
+	try {
+		const res = await fetchRequestHandler({
+			req: request,
+			router: trpcRouter,
+			endpoint: "/api/trpc",
+			createContext: ({ req, resHeaders }) =>
+				createTRPCContext({ req, resHeaders }),
+			onError: ({ error, path }) => {
+				console.error("[trpc] error in", path, error);
+			},
+		});
+		return res;
+	} catch (err) {
+		console.error("[trpc] handler crashed", err);
+		return Response.json(
+			{
+				error: "Internal Server Error",
+				message: err instanceof Error ? err.message : String(err),
+			},
+			{ status: 500 },
+		);
+	}
 }
 
 export const Route = createFileRoute("/api/trpc/$")({
