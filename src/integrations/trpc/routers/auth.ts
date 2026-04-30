@@ -27,10 +27,6 @@ const resetInput = z.object({
 
 export const authRouter = {
 	me: publicProcedure.query(({ ctx }) => {
-		console.log("[AUTH][me]", {
-			authenticated: ctx.session != null,
-			sessionId: ctx.session?.id?.slice(0, 8),
-		});
 		if (!ctx.session) return { authenticated: false as const };
 		return {
 			authenticated: true as const,
@@ -39,9 +35,7 @@ export const authRouter = {
 	}),
 
 	login: publicProcedure.input(pinInput).mutation(async ({ ctx, input }) => {
-		console.log("[AUTH][login] start", { ip: ctx.ip, ua: ctx.userAgent });
 		if (await isBlocked(ctx.ip)) {
-			console.log("[AUTH][login] blocked");
 			throw new TRPCError({
 				code: "TOO_MANY_REQUESTS",
 				message: "Trop de tentatives. Réessayez dans 30 minutes.",
@@ -49,7 +43,6 @@ export const authRouter = {
 		}
 
 		const ok = await verifyCurrentPin(input.pin);
-		console.log("[AUTH][login] verify", { ok });
 		await recordAttempt(ctx.ip, ctx.userAgent, ok);
 
 		if (!ok) {
@@ -60,12 +53,7 @@ export const authRouter = {
 		}
 
 		const session = await createSession(ctx.ip, ctx.userAgent);
-		console.log("[AUTH][login] session created", {
-			sessionId: session.id.slice(0, 8),
-			expiresAt: session.expiresAt,
-		});
 		ctx.setCookie(buildSessionSetCookie(session));
-		console.log("[AUTH][login] done");
 
 		return { ok: true as const };
 	}),

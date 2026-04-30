@@ -14,6 +14,7 @@ import { Textarea } from "#/components/ui/textarea";
 export const Route = createFileRoute("/registre/ph")({
 	component: PhPage,
 	beforeLoad: async ({ context }) => {
+		if (typeof document === "undefined") return;
 		const me = await context.queryClient.fetchQuery(
 			context.trpc.auth.me.queryOptions(),
 		);

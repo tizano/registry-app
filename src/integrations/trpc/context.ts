@@ -17,18 +17,8 @@ export async function createTRPCContext({
 	req: Request;
 	resHeaders: Headers;
 }): Promise<TRPCContext> {
-	const cookieHeader = req.headers.get("cookie");
-	const cookies = parseCookies(cookieHeader);
-	const sessionId = cookies[SESSION_COOKIE_NAME];
-	const session = await getValidSession(sessionId);
-
-	console.log("[AUTH][ctx]", {
-		url: req.url,
-		method: req.method,
-		hasCookieHeader: cookieHeader != null,
-		hasSessionCookie: sessionId != null,
-		sessionFound: session != null,
-	});
+	const cookies = parseCookies(req.headers.get("cookie"));
+	const session = await getValidSession(cookies[SESSION_COOKIE_NAME]);
 
 	const ip =
 		req.headers.get("cf-connecting-ip") ??
@@ -43,13 +33,6 @@ export async function createTRPCContext({
 		ip,
 		userAgent,
 		session,
-		setCookie: (cookie: string) => {
-			console.log(
-				"[AUTH][ctx] setCookie",
-				cookie.slice(0, 80),
-				"…",
-			);
-			resHeaders.append("Set-Cookie", cookie);
-		},
+		setCookie: (cookie: string) => resHeaders.append("Set-Cookie", cookie),
 	};
 }

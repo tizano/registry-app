@@ -15,6 +15,7 @@ import { Textarea } from "#/components/ui/textarea";
 export const Route = createFileRoute("/registre/temperature")({
 	component: TemperaturePage,
 	beforeLoad: async ({ context }) => {
+		if (typeof document === "undefined") return;
 		const me = await context.queryClient.fetchQuery(
 			context.trpc.auth.me.queryOptions(),
 		);

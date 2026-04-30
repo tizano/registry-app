@@ -13,11 +13,10 @@ import { useTRPC } from "#/integrations/trpc/react";
 export const Route = createFileRoute("/registre/")({
 	component: RegistreIndex,
 	beforeLoad: async ({ context }) => {
-		console.log("[AUTH][registre/] beforeLoad start");
+		if (typeof document === "undefined") return;
 		const me = await context.queryClient.fetchQuery(
 			context.trpc.auth.me.queryOptions(),
 		);
-		console.log("[AUTH][registre/] beforeLoad me=", me);
 		if (!me.authenticated) throw redirect({ to: "/login" });
 	},
 });

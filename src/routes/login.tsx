@@ -18,11 +18,10 @@ import { useTRPC } from "#/integrations/trpc/react";
 export const Route = createFileRoute("/login")({
 	component: LoginPage,
 	beforeLoad: async ({ context }) => {
-		console.log("[AUTH][login] beforeLoad start");
+		if (typeof document === "undefined") return;
 		const me = await context.queryClient.fetchQuery(
 			context.trpc.auth.me.queryOptions(),
 		);
-		console.log("[AUTH][login] beforeLoad me=", me);
 		if (me.authenticated) throw redirect({ to: "/registre" });
 	},
 });
@@ -37,15 +36,11 @@ function LoginPage() {
 
 	const login = useMutation(
 		trpc.auth.login.mutationOptions({
-			onSuccess: async (data) => {
-				console.log("[AUTH][login.tsx] onSuccess", data);
+			onSuccess: async () => {
 				queryClient.removeQueries({ queryKey: trpc.auth.me.queryKey() });
-				console.log("[AUTH][login.tsx] cache cleared, navigating to /registre");
 				await navigate({ to: "/registre" });
-				console.log("[AUTH][login.tsx] navigate resolved");
 			},
 			onError: (err) => {
-				console.log("[AUTH][login.tsx] onError", err);
 				setError(err.message);
 				setPin("");
 			},
