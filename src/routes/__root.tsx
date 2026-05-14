@@ -1,19 +1,20 @@
+import { Toaster } from "#/components/ui/sonner";
+import type { TRPCRouter } from "#/integrations/trpc/router";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
 	HeadContent,
+	Link,
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
-import type { TRPCRouter } from "#/integrations/trpc/router";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
-
 	trpc: TRPCOptionsProxy<TRPCRouter>;
 }
 
@@ -51,7 +52,25 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 		],
 	}),
 	shellComponent: RootDocument,
+	notFoundComponent: NotFound,
 });
+
+function NotFound() {
+	return (
+		<div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
+			<h1 className="text-3xl font-semibold">Page introuvable</h1>
+			<p className="text-muted-foreground">
+				La page demandée n'existe pas ou a été déplacée.
+			</p>
+			<Link
+				to="/"
+				className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
+			>
+				Retour à l'accueil
+			</Link>
+		</div>
+	);
+}
 
 const SW_REGISTRATION = `
 if ('serviceWorker' in navigator) {
@@ -73,6 +92,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				{children}
+				<Toaster richColors position="top-center" />
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",

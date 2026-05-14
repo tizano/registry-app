@@ -1,31 +1,25 @@
-import {
-	createFileRoute,
-	Navigate,
-	useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { PhotoCapture } from "#/components/PhotoCapture";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 import { Textarea } from "#/components/ui/textarea";
-import { useAuthGuard } from "#/lib/auth-guard";
 
-export const Route = createFileRoute("/registre/temperature")({
+export const Route = createFileRoute("/_authenticated/registre/temperature")({
 	component: TemperaturePage,
 });
 
 function TemperaturePage() {
 	const navigate = useNavigate();
-	const guard = useAuthGuard();
 	const [value, setValue] = useState("");
 	const [unit, setUnit] = useState<"C" | "F">("C");
 	const [photo, setPhoto] = useState<File | null>(null);
 	const [note, setNote] = useState("");
 	const [submitting, setSubmitting] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 
 	const numericValue = Number(value.replace(",", "."));
 	const valueValid = Number.isFinite(numericValue) && value.trim().length > 0;
@@ -33,7 +27,6 @@ function TemperaturePage() {
 	async function submit() {
 		if (!photo || !valueValid) return;
 		setSubmitting(true);
-		setError(null);
 		try {
 			const form = new FormData();
 			form.append("photo", photo);
@@ -52,22 +45,19 @@ function TemperaturePage() {
 			}
 			const data = (await res.json()) as { sheetSynced: boolean };
 			if (!data.sheetSynced) {
-				setError(
+				toast.warning(
 					"Saisie enregistrée, mais la synchro Google Sheets a échoué. Un admin pourra rejouer la synchro plus tard.",
 				);
-				setSubmitting(false);
-				return;
+			} else {
+				toast.success("Température enregistrée.");
 			}
 			navigate({ to: "/registre" });
 		} catch (err) {
-			setError(err instanceof Error ? err.message : "Erreur inconnue");
+			toast.error(err instanceof Error ? err.message : "Erreur inconnue");
 		} finally {
 			setSubmitting(false);
 		}
 	}
-
-	if (guard.state === "loading") return null;
-	if (guard.state === "unauthenticated") return <Navigate to="/login" />;
 
 	return (
 		<div className="flex min-h-dvh flex-col p-6 gap-5">
@@ -81,10 +71,10 @@ function TemperaturePage() {
 				>
 					<ArrowLeftIcon />
 				</Button>
-				<h1 className="text-lg font-medium">Registre Température</h1>
+				<h1 className="text-lg font-medium">Mesurer la température</h1>
 			</header>
 
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-2 mt-4">
 				<Label htmlFor="value">Température</Label>
 				<div className="flex gap-2">
 					<Input
@@ -115,15 +105,9 @@ function TemperaturePage() {
 				/>
 			</div>
 
-			{error && (
-				<p className="text-sm text-destructive" role="alert">
-					{error}
-				</p>
-			)}
-
 			<Button
 				size="lg"
-				className="mt-auto"
+				className="mt-6"
 				disabled={!photo || !valueValid || submitting}
 				onClick={submit}
 			>

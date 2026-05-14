@@ -1,12 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-	createFileRoute,
-	Navigate,
-	useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { LockKeyholeIcon } from "lucide-react";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import {
 	InputOTP,
@@ -14,9 +11,14 @@ import {
 	InputOTPSlot,
 } from "#/components/ui/input-otp";
 import { useTRPC } from "#/integrations/trpc/react";
-import { useAuthGuard } from "#/lib/auth-guard";
 
 export const Route = createFileRoute("/login")({
+	beforeLoad: async ({ context }) => {
+		const me = await context.queryClient.ensureQueryData(
+			context.trpc.auth.me.queryOptions(),
+		);
+		if (me.authenticated) throw redirect({ to: "/registre" });
+	},
 	component: LoginPage,
 });
 
@@ -24,9 +26,7 @@ function LoginPage() {
 	const navigate = useNavigate();
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
-	const guard = useAuthGuard();
 	const [pin, setPin] = useState("");
-	const [error, setError] = useState<string | null>(null);
 	const tapTimes = useRef<number[]>([]);
 
 	const login = useMutation(
@@ -36,19 +36,15 @@ function LoginPage() {
 				await navigate({ to: "/registre" });
 			},
 			onError: (err) => {
-				setError(err.message);
+				toast.error(err.message);
 				setPin("");
 			},
 		}),
 	);
 
-	if (guard.state === "authenticated") return <Navigate to="/registre" />;
-
 	function handleHiddenTap() {
 		const now = Date.now();
-		tapTimes.current = [...tapTimes.current, now].filter(
-			(t) => now - t < 3000,
-		);
+		tapTimes.current = [...tapTimes.current, now].filter((t) => now - t < 3000);
 		if (tapTimes.current.length >= 7) {
 			tapTimes.current = [];
 			navigate({ to: "/reset" });
@@ -73,7 +69,6 @@ function LoginPage() {
 				inputMode="numeric"
 				value={pin}
 				onChange={(v) => {
-					setError(null);
 					setPin(v);
 				}}
 				onComplete={(value) => login.mutate({ pin: value })}
@@ -81,20 +76,13 @@ function LoginPage() {
 				autoFocus
 			>
 				<InputOTPGroup className="gap-2 [&>div]:size-12 [&>div]:rounded-md [&>div]:border [&>div]:text-lg">
-					<InputOTPSlot index={0} />
-					<InputOTPSlot index={1} />
-					<InputOTPSlot index={2} />
-					<InputOTPSlot index={3} />
-					<InputOTPSlot index={4} />
-					<InputOTPSlot index={5} />
+					{Array.from({ length: 6 }, (_, i) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: index is stable here
+						<InputOTPSlot key={i} index={i} />
+					))}
 				</InputOTPGroup>
 			</InputOTP>
 
-			{error && (
-				<p className="text-sm text-destructive" role="alert">
-					{error}
-				</p>
-			)}
 			{login.isPending && (
 				<p className="text-sm text-muted-foreground">Vérification…</p>
 			)}

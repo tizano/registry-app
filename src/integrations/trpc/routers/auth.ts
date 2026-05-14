@@ -1,6 +1,3 @@
-import type { TRPCRouterRecord } from "@trpc/server";
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import {
 	isValidPinFormat,
 	setNewPin,
@@ -14,6 +11,9 @@ import {
 	createSession,
 	destroySession,
 } from "#/server/auth/session.ts";
+import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { protectedProcedure, publicProcedure } from "../init";
 
 const pinInput = z.object({

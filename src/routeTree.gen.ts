@@ -11,13 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as RegistreIndexRouteImport } from './routes/registre.index'
-import { Route as RegistreTemperatureRouteImport } from './routes/registre.temperature'
-import { Route as RegistrePhRouteImport } from './routes/registre.ph'
+import { Route as AuthenticatedRegistreIndexRouteImport } from './routes/_authenticated/registre.index'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api.trpc.$'
 import { Route as ApiRegistreTemperatureRouteImport } from './routes/api.registre.temperature'
 import { Route as ApiRegistrePhRouteImport } from './routes/api.registre.ph'
+import { Route as AuthenticatedRegistreTemperatureRouteImport } from './routes/_authenticated/registre.temperature'
+import { Route as AuthenticatedRegistrePhRouteImport } from './routes/_authenticated/registre.ph'
 
 const ResetRoute = ResetRouteImport.update({
   id: '/reset',
@@ -29,26 +30,21 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RegistreIndexRoute = RegistreIndexRouteImport.update({
-  id: '/registre/',
-  path: '/registre/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegistreTemperatureRoute = RegistreTemperatureRouteImport.update({
-  id: '/registre/temperature',
-  path: '/registre/temperature',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegistrePhRoute = RegistrePhRouteImport.update({
-  id: '/registre/ph',
-  path: '/registre/ph',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedRegistreIndexRoute =
+  AuthenticatedRegistreIndexRouteImport.update({
+    id: '/registre/',
+    path: '/registre/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
@@ -64,40 +60,52 @@ const ApiRegistrePhRoute = ApiRegistrePhRouteImport.update({
   path: '/api/registre/ph',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRegistreTemperatureRoute =
+  AuthenticatedRegistreTemperatureRouteImport.update({
+    id: '/registre/temperature',
+    path: '/registre/temperature',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedRegistrePhRoute = AuthenticatedRegistrePhRouteImport.update({
+  id: '/registre/ph',
+  path: '/registre/ph',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset': typeof ResetRoute
-  '/registre/ph': typeof RegistrePhRoute
-  '/registre/temperature': typeof RegistreTemperatureRoute
-  '/registre/': typeof RegistreIndexRoute
+  '/registre/ph': typeof AuthenticatedRegistrePhRoute
+  '/registre/temperature': typeof AuthenticatedRegistreTemperatureRoute
   '/api/registre/ph': typeof ApiRegistrePhRoute
   '/api/registre/temperature': typeof ApiRegistreTemperatureRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/registre/': typeof AuthenticatedRegistreIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset': typeof ResetRoute
-  '/registre/ph': typeof RegistrePhRoute
-  '/registre/temperature': typeof RegistreTemperatureRoute
-  '/registre': typeof RegistreIndexRoute
+  '/registre/ph': typeof AuthenticatedRegistrePhRoute
+  '/registre/temperature': typeof AuthenticatedRegistreTemperatureRoute
   '/api/registre/ph': typeof ApiRegistrePhRoute
   '/api/registre/temperature': typeof ApiRegistreTemperatureRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/registre': typeof AuthenticatedRegistreIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/reset': typeof ResetRoute
-  '/registre/ph': typeof RegistrePhRoute
-  '/registre/temperature': typeof RegistreTemperatureRoute
-  '/registre/': typeof RegistreIndexRoute
+  '/_authenticated/registre/ph': typeof AuthenticatedRegistrePhRoute
+  '/_authenticated/registre/temperature': typeof AuthenticatedRegistreTemperatureRoute
   '/api/registre/ph': typeof ApiRegistrePhRoute
   '/api/registre/temperature': typeof ApiRegistreTemperatureRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/_authenticated/registre/': typeof AuthenticatedRegistreIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,10 +115,10 @@ export interface FileRouteTypes {
     | '/reset'
     | '/registre/ph'
     | '/registre/temperature'
-    | '/registre/'
     | '/api/registre/ph'
     | '/api/registre/temperature'
     | '/api/trpc/$'
+    | '/registre/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,30 +126,29 @@ export interface FileRouteTypes {
     | '/reset'
     | '/registre/ph'
     | '/registre/temperature'
-    | '/registre'
     | '/api/registre/ph'
     | '/api/registre/temperature'
     | '/api/trpc/$'
+    | '/registre'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/login'
     | '/reset'
-    | '/registre/ph'
-    | '/registre/temperature'
-    | '/registre/'
+    | '/_authenticated/registre/ph'
+    | '/_authenticated/registre/temperature'
     | '/api/registre/ph'
     | '/api/registre/temperature'
     | '/api/trpc/$'
+    | '/_authenticated/registre/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ResetRoute: typeof ResetRoute
-  RegistrePhRoute: typeof RegistrePhRoute
-  RegistreTemperatureRoute: typeof RegistreTemperatureRoute
-  RegistreIndexRoute: typeof RegistreIndexRoute
   ApiRegistrePhRoute: typeof ApiRegistrePhRoute
   ApiRegistreTemperatureRoute: typeof ApiRegistreTemperatureRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
@@ -163,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -170,26 +184,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/registre/': {
-      id: '/registre/'
+    '/_authenticated/registre/': {
+      id: '/_authenticated/registre/'
       path: '/registre'
       fullPath: '/registre/'
-      preLoaderRoute: typeof RegistreIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/registre/temperature': {
-      id: '/registre/temperature'
-      path: '/registre/temperature'
-      fullPath: '/registre/temperature'
-      preLoaderRoute: typeof RegistreTemperatureRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/registre/ph': {
-      id: '/registre/ph'
-      path: '/registre/ph'
-      fullPath: '/registre/ph'
-      preLoaderRoute: typeof RegistrePhRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedRegistreIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/api/trpc/$': {
       id: '/api/trpc/$'
@@ -212,16 +212,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiRegistrePhRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/registre/temperature': {
+      id: '/_authenticated/registre/temperature'
+      path: '/registre/temperature'
+      fullPath: '/registre/temperature'
+      preLoaderRoute: typeof AuthenticatedRegistreTemperatureRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/registre/ph': {
+      id: '/_authenticated/registre/ph'
+      path: '/registre/ph'
+      fullPath: '/registre/ph'
+      preLoaderRoute: typeof AuthenticatedRegistrePhRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedRegistrePhRoute: typeof AuthenticatedRegistrePhRoute
+  AuthenticatedRegistreTemperatureRoute: typeof AuthenticatedRegistreTemperatureRoute
+  AuthenticatedRegistreIndexRoute: typeof AuthenticatedRegistreIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedRegistrePhRoute: AuthenticatedRegistrePhRoute,
+  AuthenticatedRegistreTemperatureRoute: AuthenticatedRegistreTemperatureRoute,
+  AuthenticatedRegistreIndexRoute: AuthenticatedRegistreIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   ResetRoute: ResetRoute,
-  RegistrePhRoute: RegistrePhRoute,
-  RegistreTemperatureRoute: RegistreTemperatureRoute,
-  RegistreIndexRoute: RegistreIndexRoute,
   ApiRegistrePhRoute: ApiRegistrePhRoute,
   ApiRegistreTemperatureRoute: ApiRegistreTemperatureRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,

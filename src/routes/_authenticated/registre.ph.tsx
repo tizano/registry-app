@@ -1,33 +1,26 @@
-import {
-	createFileRoute,
-	Navigate,
-	useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { PhotoCapture } from "#/components/PhotoCapture";
 import { Button } from "#/components/ui/button";
 import { Label } from "#/components/ui/label";
 import { Textarea } from "#/components/ui/textarea";
-import { useAuthGuard } from "#/lib/auth-guard";
 
-export const Route = createFileRoute("/registre/ph")({
+export const Route = createFileRoute("/_authenticated/registre/ph")({
 	component: PhPage,
 });
 
 function PhPage() {
 	const navigate = useNavigate();
-	const guard = useAuthGuard();
 	const [photo, setPhoto] = useState<File | null>(null);
 	const [note, setNote] = useState("");
 	const [submitting, setSubmitting] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 
 	async function submit() {
 		if (!photo) return;
 		setSubmitting(true);
-		setError(null);
 		try {
 			const form = new FormData();
 			form.append("photo", photo);
@@ -44,22 +37,19 @@ function PhPage() {
 			}
 			const data = (await res.json()) as { sheetSynced: boolean };
 			if (!data.sheetSynced) {
-				setError(
+				toast.warning(
 					"Saisie enregistrée, mais la synchro Google Sheets a échoué. Un admin pourra rejouer la synchro plus tard.",
 				);
-				setSubmitting(false);
-				return;
+			} else {
+				toast.success("Mesure de pH enregistrée.");
 			}
 			navigate({ to: "/registre" });
 		} catch (err) {
-			setError(err instanceof Error ? err.message : "Erreur inconnue");
+			toast.error(err instanceof Error ? err.message : "Erreur inconnue");
 		} finally {
 			setSubmitting(false);
 		}
 	}
-
-	if (guard.state === "loading") return null;
-	if (guard.state === "unauthenticated") return <Navigate to="/login" />;
 
 	return (
 		<div className="flex min-h-dvh flex-col p-6 gap-5">
@@ -73,7 +63,7 @@ function PhPage() {
 				>
 					<ArrowLeftIcon />
 				</Button>
-				<h1 className="text-lg font-medium">Registre pH</h1>
+				<h1 className="text-lg font-medium">Mesurer le pH</h1>
 			</header>
 
 			<PhotoCapture file={photo} onChange={setPhoto} disabled={submitting} />
@@ -91,15 +81,9 @@ function PhPage() {
 				/>
 			</div>
 
-			{error && (
-				<p className="text-sm text-destructive" role="alert">
-					{error}
-				</p>
-			)}
-
 			<Button
 				size="lg"
-				className="mt-auto"
+				className="mt-6"
 				disabled={!photo || submitting}
 				onClick={submit}
 			>
