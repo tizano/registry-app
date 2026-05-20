@@ -31,10 +31,7 @@ async function findFolder(
 	return res.data.files?.[0]?.id ?? null;
 }
 
-async function createFolder(
-	parentId: string,
-	name: string,
-): Promise<string> {
+async function createFolder(parentId: string, name: string): Promise<string> {
 	const drive = getDrive();
 	const res = await drive.files.create({
 		requestBody: {
@@ -75,10 +72,7 @@ export async function ensureRegistryPath(
 		registryFolderId,
 		yearFolderName(date),
 	);
-	const monthFolderId = await ensureFolder(
-		yearFolderId,
-		monthFolderName(date),
-	);
+	const monthFolderId = await ensureFolder(yearFolderId, monthFolderName(date));
 	return { registryFolderId, yearFolderId, monthFolderId };
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE "ph_entries" ADD COLUMN "value" numeric(4, 2) NOT NULL;

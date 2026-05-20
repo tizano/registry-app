@@ -60,6 +60,7 @@ export const phEntries = pgTable(
 	"ph_entries",
 	{
 		id: serial().primaryKey(),
+		value: numeric({ precision: 4, scale: 2, mode: "number" }).notNull(),
 		note: text(),
 		photoDriveId: text("photo_drive_id").notNull(),
 		photoUrl: text("photo_url").notNull(),

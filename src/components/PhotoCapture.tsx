@@ -1,8 +1,6 @@
 import { CameraIcon, RotateCcwIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { Button } from "#/components/ui/button";
-
 export function PhotoCapture({
 	file,
 	onChange,
@@ -30,7 +28,7 @@ export function PhotoCapture({
 	}
 
 	return (
-		<div className="flex flex-col gap-3">
+		<div className="flex flex-col gap-2">
 			<input
 				ref={inputRef}
 				type="file"
@@ -46,33 +44,40 @@ export function PhotoCapture({
 			/>
 
 			{previewUrl ? (
-				<div className="flex flex-col gap-2">
-					<img
-						src={previewUrl}
-						alt="Aperçu"
-						className="w-full rounded-xl border object-cover max-h-[50dvh]"
-					/>
-					<Button
+				<div className="space-y-2">
+					<div className="relative w-full overflow-hidden rounded-xl border border-slate-200">
+						<img
+							src={previewUrl}
+							alt="Aperçu"
+							className="aspect-4/3 w-full object-cover"
+						/>
+					</div>
+					<button
 						type="button"
-						variant="outline"
-						size="lg"
 						onClick={openPicker}
 						disabled={disabled}
+						className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-[15px] font-medium text-slate-900 transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50"
 					>
-						<RotateCcwIcon /> Reprendre la photo
-					</Button>
+						<RotateCcwIcon className="size-3.75" /> Reprendre
+					</button>
 				</div>
 			) : (
-				<Button
+				<button
 					type="button"
-					size="lg"
 					onClick={openPicker}
 					disabled={disabled}
-					className="h-32 flex-col gap-2 text-base"
+					className="flex w-full flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-10 transition-all duration-150 hover:border-slate-400 hover:bg-slate-100 disabled:opacity-50"
 				>
-					<CameraIcon className="size-8" />
-					Prendre la photo
-				</Button>
+					<span className="flex size-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+						<CameraIcon className="size-5" />
+					</span>
+					<span className="text-sm font-medium text-slate-700">
+						Prendre la photo
+					</span>
+					<span className="text-xs text-slate-500">
+						Requis pour enregistrer
+					</span>
+				</button>
 			)}
 		</div>
 	);

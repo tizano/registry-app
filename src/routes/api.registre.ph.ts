@@ -7,7 +7,10 @@ import { createPhEntry } from "#/server/registre/create.ts";
 const MAX_PHOTO_BYTES = 20 * 1024 * 1024;
 const MAX_NOTE_LEN = 500;
 
-const noteSchema = z.string().max(MAX_NOTE_LEN).optional();
+const inputSchema = z.object({
+	value: z.coerce.number().min(0).max(14),
+	note: z.string().max(MAX_NOTE_LEN).optional(),
+});
 
 async function handler({ request }: { request: Request }) {
 	const session = await getSessionFromRequest(request);
@@ -33,19 +36,25 @@ async function handler({ request }: { request: Request }) {
 		return Response.json({ error: "Photo too large" }, { status: 413 });
 	}
 
-	const noteRaw = form.get("note");
-	const noteParsed = noteSchema.safeParse(
-		typeof noteRaw === "string" ? noteRaw : undefined,
-	);
-	if (!noteParsed.success) {
-		return Response.json({ error: "Invalid note" }, { status: 400 });
+	const parsed = inputSchema.safeParse({
+		value: form.get("value"),
+		note: typeof form.get("note") === "string" ? form.get("note") : undefined,
+	});
+	if (!parsed.success) {
+		return Response.json(
+			{ error: "Invalid input", issues: parsed.error.issues },
+			{ status: 400 },
+		);
 	}
-	const note = noteParsed.data?.trim() || null;
 
 	const buffer = Buffer.from(await photoField.arrayBuffer());
 
 	try {
-		const result = await createPhEntry({ photo: buffer, note });
+		const result = await createPhEntry({
+			photo: buffer,
+			value: parsed.data.value,
+			note: parsed.data.note?.trim() || null,
+		});
 		return Response.json({ ok: true, ...result });
 	} catch (err) {
 		console.error("createPhEntry failed", err);

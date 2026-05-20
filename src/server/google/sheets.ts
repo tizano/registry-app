@@ -16,7 +16,7 @@ const ANNEXE_IMAGE_ROW_HEIGHT = 320;
 const ANNEXE_IMAGE_COL_WIDTH = 480;
 
 const HEADERS_BY_TYPE = {
-	ph: ["Date", "Heure", "Note", "Lien photo"],
+	ph: ["Date", "Heure", "pH", "Note", "Lien photo"],
 	temperature: [
 		"Date",
 		"Heure",
@@ -191,9 +191,8 @@ async function createSpreadsheet(
 	if (!spreadsheetId) throw new Error("Sheets create returned no id");
 
 	const annexeSheetId =
-		created.data.sheets?.find(
-			(s) => s.properties?.title === ANNEXE_SHEET_TITLE,
-		)?.properties?.sheetId ?? null;
+		created.data.sheets?.find((s) => s.properties?.title === ANNEXE_SHEET_TITLE)
+			?.properties?.sheetId ?? null;
 
 	await sheets.spreadsheets.values.batchUpdate({
 		spreadsheetId,
@@ -278,6 +277,7 @@ export type TemperatureRow = {
 export type PhRow = {
 	dateLabel: string;
 	timeLabel: string;
+	value: number;
 	note: string;
 	photoLink: string;
 };
@@ -322,6 +322,7 @@ export async function appendPhRow(date: Date, row: PhRow): Promise<void> {
 	await appendRow("ph", date, [
 		row.dateLabel,
 		row.timeLabel,
+		row.value,
 		row.note,
 		row.photoLink,
 	]);

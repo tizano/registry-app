@@ -3,10 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "#/db/index.ts";
 import { phEntries, syncFailures, temperatureEntries } from "#/db/schema.ts";
 import { ensureRegistryPath, uploadPhoto } from "#/server/google/drive.ts";
-import {
-	appendPhRow,
-	appendTemperatureRow,
-} from "#/server/google/sheets.ts";
+import { appendPhRow, appendTemperatureRow } from "#/server/google/sheets.ts";
 import { processImage } from "#/server/image/process.ts";
 import { withRetry } from "#/server/retry.ts";
 import {
@@ -50,6 +47,7 @@ async function processAndUpload(
 
 export async function createPhEntry(args: {
 	photo: Buffer;
+	value: number;
 	note: string | null;
 }): Promise<{ id: number; photoUrl: string; sheetSynced: boolean }> {
 	const asset = await processAndUpload("ph", args.photo);
@@ -57,6 +55,7 @@ export async function createPhEntry(args: {
 	const [row] = await db
 		.insert(phEntries)
 		.values({
+			value: args.value,
 			note: args.note,
 			photoDriveId: asset.driveId,
 			photoUrl: asset.url,
@@ -70,6 +69,7 @@ export async function createPhEntry(args: {
 			appendPhRow(asset.capturedAt, {
 				dateLabel: dateLabel(asset.capturedAt),
 				timeLabel: timeLabel(asset.capturedAt),
+				value: args.value,
 				note: args.note ?? "",
 				photoLink: asset.url,
 			}),

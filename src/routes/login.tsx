@@ -52,40 +52,56 @@ function LoginPage() {
 	}
 
 	return (
-		<div className="flex min-h-dvh flex-col items-center justify-center gap-8 p-6">
-			<button
-				type="button"
-				onClick={handleHiddenTap}
-				className="rounded-full p-3"
-				aria-label="Connexion"
-			>
-				<LockKeyholeIcon className="size-10 text-muted-foreground" />
-			</button>
-			<h1 className="text-xl font-medium">Entrez votre code PIN</h1>
+		<div className="flex min-h-dvh flex-col bg-slate-50 text-slate-900">
+			<header className="flex items-center justify-between px-7 pt-6 pb-3">
+				<span className="text-[11px] font-medium tracking-[0.22em] uppercase text-slate-500">
+					MAPAQ
+				</span>
+				<span className="text-[11px] font-medium tracking-tight text-slate-500">
+					v2.3.0
+				</span>
+			</header>
 
-			<InputOTP
-				maxLength={6}
-				pattern={REGEXP_ONLY_DIGITS}
-				inputMode="numeric"
-				value={pin}
-				onChange={(v) => {
-					setPin(v);
-				}}
-				onComplete={(value) => login.mutate({ pin: value })}
-				disabled={login.isPending}
-				autoFocus
-			>
-				<InputOTPGroup className="gap-2 [&>div]:size-12 [&>div]:rounded-md [&>div]:border [&>div]:text-lg">
-					{Array.from({ length: 6 }, (_, i) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: index is stable here
-						<InputOTPSlot key={i} index={i} />
-					))}
-				</InputOTPGroup>
-			</InputOTP>
+			<main className="flex flex-1 flex-col justify-center px-7 -mt-12">
+				<button
+					type="button"
+					onClick={handleHiddenTap}
+					aria-label="Connexion"
+					className="mb-7 flex size-12 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-slate-50"
+				>
+					<LockKeyholeIcon className="size-5" />
+				</button>
 
-			{login.isPending && (
-				<p className="text-sm text-muted-foreground">Vérification…</p>
-			)}
+				<h1 className="text-[22px] font-semibold tracking-[-0.01em] leading-tight">
+					Entrez votre code PIN
+				</h1>
+				<p className="mt-1.5 text-sm leading-snug text-slate-500">
+					Code à 6 chiffres pour accéder aux registres.
+				</p>
+
+				<InputOTP
+					maxLength={6}
+					pattern={REGEXP_ONLY_DIGITS}
+					inputMode="numeric"
+					value={pin}
+					onChange={setPin}
+					onComplete={(value) => login.mutate({ pin: value })}
+					disabled={login.isPending}
+					autoFocus
+					containerClassName="mt-8"
+				>
+					<InputOTPGroup className="grid w-full grid-cols-6 gap-2 [&>div]:aspect-square [&>div]:h-auto [&>div]:w-full [&>div]:rounded-lg [&>div]:border [&>div]:border-slate-200 [&>div]:bg-white [&>div]:text-[20px] [&>div]:font-semibold [&>div]:tabular-nums [&>div]:text-slate-900">
+						{Array.from({ length: 6 }, (_, i) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: index is stable here
+							<InputOTPSlot key={i} index={i} />
+						))}
+					</InputOTPGroup>
+				</InputOTP>
+
+				<p className="mt-3 text-[13px] text-slate-500">
+					{login.isPending ? "Vérification…" : null}
+				</p>
+			</main>
 		</div>
 	);
 }

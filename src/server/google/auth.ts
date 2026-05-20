@@ -22,7 +22,10 @@ export function getGoogleAuth() {
 	}
 
 	const oauth = new google.auth.OAuth2(clientId, clientSecret);
-	oauth.setCredentials({ refresh_token: refreshToken, scope: SCOPES.join(" ") });
+	oauth.setCredentials({
+		refresh_token: refreshToken,
+		scope: SCOPES.join(" "),
+	});
 	cachedClient = oauth;
 	return cachedClient;
 }

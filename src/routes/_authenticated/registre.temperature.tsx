@@ -1,13 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeftIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { MeasureHeader, StickySubmit } from "#/components/MeasureLayout";
 import { PhotoCapture } from "#/components/PhotoCapture";
-import { Button } from "#/components/ui/button";
-import { Input } from "#/components/ui/input";
-import { Label } from "#/components/ui/label";
-import { Textarea } from "#/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/registre/temperature")({
 	component: TemperaturePage,
@@ -23,6 +19,7 @@ function TemperaturePage() {
 
 	const numericValue = Number(value.replace(",", "."));
 	const valueValid = Number.isFinite(numericValue) && value.trim().length > 0;
+	const valid = Boolean(photo) && valueValid;
 
 	async function submit() {
 		if (!photo || !valueValid) return;
@@ -60,59 +57,85 @@ function TemperaturePage() {
 	}
 
 	return (
-		<div className="flex min-h-dvh flex-col p-6 gap-5">
-			<header className="flex items-center gap-2">
-				<Button
-					variant="ghost"
-					size="icon"
-					onClick={() => navigate({ to: "/registre" })}
-					disabled={submitting}
-					aria-label="Retour"
-				>
-					<ArrowLeftIcon />
-				</Button>
-				<h1 className="text-lg font-medium">Mesurer la température</h1>
-			</header>
+		<div className="relative flex min-h-dvh flex-col bg-slate-50 text-slate-900">
+			<MeasureHeader
+				title="Mesurer la température"
+				onBack={() => navigate({ to: "/registre" })}
+				disabled={submitting}
+			/>
 
-			<div className="flex flex-col gap-2 mt-4">
-				<Label htmlFor="value">Température</Label>
-				<div className="flex gap-2">
-					<Input
-						id="value"
-						type="text"
-						inputMode="decimal"
-						value={value}
-						onChange={(e) => setValue(e.target.value)}
-						disabled={submitting}
-						placeholder="0"
-						className="flex-1 text-2xl h-14"
-					/>
-					<UnitToggle value={unit} onChange={setUnit} disabled={submitting} />
+			<main className="flex-1 overflow-y-auto px-5 pt-5 pb-32">
+				<div>
+					<label
+						htmlFor="temp-value"
+						className="text-[13px] font-medium text-slate-900"
+					>
+						Température
+					</label>
+					<p className="mt-0.5 text-xs text-slate-500">
+						Indiquée sur la plonge
+					</p>
+					<div className="mt-2 flex items-stretch gap-2">
+						<div className="relative flex-1">
+							<input
+								id="temp-value"
+								type="number"
+								inputMode="decimal"
+								step="0.1"
+								value={value}
+								onChange={(e) => setValue(e.target.value)}
+								disabled={submitting}
+								placeholder="180"
+								className="h-12 w-full rounded-lg border border-slate-200 bg-white px-3.5 pr-12 text-[18px] font-semibold tabular-nums text-slate-900 placeholder:text-slate-300 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+							/>
+							<span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[13px] font-medium text-slate-400">
+								°{unit}
+							</span>
+						</div>
+						<UnitToggle value={unit} onChange={setUnit} disabled={submitting} />
+					</div>
 				</div>
-			</div>
 
-			<PhotoCapture file={photo} onChange={setPhoto} disabled={submitting} />
+				<section className="mt-6">
+					<div className="mb-2 flex items-baseline justify-between">
+						<span className="text-[13px] font-medium">Photo de la mesure</span>
+						<span className="text-[11px] font-medium text-rose-600">
+							Requis
+						</span>
+					</div>
+					<PhotoCapture
+						file={photo}
+						onChange={setPhoto}
+						disabled={submitting}
+					/>
+				</section>
 
-			<div className="flex flex-col gap-2">
-				<Label htmlFor="note">Note (optionnelle)</Label>
-				<Textarea
-					id="note"
-					value={note}
-					onChange={(e) => setNote(e.target.value)}
-					rows={3}
-					maxLength={500}
-					disabled={submitting}
-				/>
-			</div>
+				<div className="mt-6">
+					<label
+						htmlFor="temp-note"
+						className="text-[13px] font-medium text-slate-900"
+					>
+						Note{" "}
+						<span className="font-normal text-slate-500">(optionnelle)</span>
+					</label>
+					<textarea
+						id="temp-note"
+						value={note}
+						onChange={(e) => setNote(e.target.value)}
+						rows={3}
+						maxLength={500}
+						disabled={submitting}
+						placeholder="Observation, valeur lue, conditions…"
+						className="mt-1.5 w-full resize-none rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm leading-snug text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+					/>
+				</div>
+			</main>
 
-			<Button
-				size="lg"
-				className="mt-6"
-				disabled={!photo || !valueValid || submitting}
-				onClick={submit}
-			>
-				{submitting ? "Envoi…" : "Enregistrer"}
-			</Button>
+			<StickySubmit
+				disabled={!valid || submitting}
+				submitting={submitting}
+				onSubmit={submit}
+			/>
 		</div>
 	);
 }
@@ -127,19 +150,19 @@ function UnitToggle({
 	disabled?: boolean;
 }) {
 	return (
-		<div className="flex h-14 rounded-lg border bg-background p-1">
+		<div className="inline-flex h-12 rounded-lg border border-slate-200 bg-white p-1">
 			{(["C", "F"] as const).map((u) => (
 				<button
 					key={u}
 					type="button"
 					disabled={disabled}
 					onClick={() => onChange(u)}
-					className={`flex-1 px-4 rounded-md text-base font-medium transition-colors ${
-						value === u
-							? "bg-primary text-primary-foreground"
-							: "text-muted-foreground hover:bg-muted"
-					}`}
 					aria-pressed={value === u}
+					className={`rounded-md px-3 text-[13px] font-medium transition-colors ${
+						value === u
+							? "bg-slate-900 text-white"
+							: "text-slate-500 hover:text-slate-900"
+					}`}
 				>
 					°{u}
 				</button>

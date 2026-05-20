@@ -1,5 +1,5 @@
-import { hash, type Options, verify } from "@node-rs/argon2";
 import { randomBytes } from "node:crypto";
+import { hash, type Options, verify } from "@node-rs/argon2";
 
 const ARGON_OPTIONS: Options = {
 	memoryCost: 19456,

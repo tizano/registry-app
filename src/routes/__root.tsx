@@ -1,5 +1,3 @@
-import { Toaster } from "#/components/ui/sonner";
-import type { TRPCRouter } from "#/integrations/trpc/router";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -10,6 +8,8 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import { Toaster } from "#/components/ui/sonner";
+import type { TRPCRouter } from "#/integrations/trpc/router";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
