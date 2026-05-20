@@ -58,7 +58,7 @@ function LoginPage() {
 					MAPAQ
 				</span>
 				<span className="text-[11px] font-medium tracking-tight text-slate-500">
-					v2.3.0
+					{import.meta.env.VITE_APP_COMPANY_NAME}
 				</span>
 			</header>
 
